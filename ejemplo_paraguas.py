@@ -1,33 +1,34 @@
-# Ejemplo de IA: ¿Llevar paraguas según el clima?
-# Usaremos un árbol de decisión con datos simulados
-
+# umbrella_ai.py
 from sklearn.tree import DecisionTreeClassifier
 import pandas as pd
 
-# Datos simulados: 1 = sí, 0 = no
-# columnas: [lluvia, nublado, viento]
-data = [
-    [1, 0, 0],  # Lluvia, no nublado, no viento
-    [0, 1, 0],  # No lluvia, nublado, no viento
-    [0, 0, 1],  # No lluvia, no nublado, viento
-    [1, 1, 1],  # Lluvia, nublado, viento
-    [0, 1, 1],  # No lluvia, nublado, viento
-    [1, 0, 1],  # Lluvia, no nublado, viento
-    [0, 0, 0],  # No lluvia, no nublado, no viento
-]
-# Etiquetas: 1 = llevar paraguas, 0 = no llevar
-labels = [1, 0, 0, 1, 0, 1, 0]
+# Creamos datos simulados de clima
+data = {
+    "prob_lluvia": [10, 80, 50, 90, 20, 70],
+    "humedad": [30, 85, 60, 95, 40, 80],
+    "viento": [5, 10, 7, 20, 6, 15],   # velocidad del viento km/h
+    "llevar_paraguas": ["No", "Sí", "Sí", "Sí", "No", "Sí"]
+}
 
-# Crear DataFrame
-X = pd.DataFrame(data, columns=["lluvia", "nublado", "viento"])
-y = pd.Series(labels)
+# Convertimos a DataFrame
+df = pd.DataFrame(data)
 
-# Entrenar el modelo
-clf = DecisionTreeClassifier()
-clf.fit(X, y)
+# Variables de entrada (X) y salida (y)
+X = df[["prob_lluvia", "humedad", "viento"]]
+y = df["llevar_paraguas"]
 
-# Probar con un nuevo día: llueve, está nublado y hay viento
-nuevo_dia = pd.DataFrame([[1, 1, 1]], columns=["lluvia", "nublado", "viento"])
-resultado = clf.predict(nuevo_dia)
+# Creamos el modelo de IA (árbol de decisión)
+modelo = DecisionTreeClassifier()
+modelo.fit(X, y)
 
-print("¿Debo llevar paraguas hoy?", "Sí" if resultado[0] == 1 else "No")
+# Caso nuevo de la vida diaria: pronóstico de hoy
+hoy = pd.DataFrame({
+    "prob_lluvia": [75],
+    "humedad": [70],
+    "viento": [12]
+})
+
+# Predicción
+prediccion = modelo.predict(hoy)
+
+print("¿Debe llevar paraguas hoy?:", prediccion[0])
