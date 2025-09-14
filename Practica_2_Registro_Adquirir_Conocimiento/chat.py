@@ -1,50 +1,94 @@
-import json
-import os
+# Importamos librerías necesarias
+import json           # Para manejar la base de conocimiento en formato JSON
+import os             # Para comprobar si el archivo de conocimiento existe
+from colorama import Fore, Style, init   # Para darle color a la salida en consola
 
-# Nombre del archivo de conocimiento
+# Inicializamos colorama (sirve para que los colores funcionen en Windows/Linux)
+init(autoreset=True)
+
+# Definimos el nombre del archivo donde se guardará el conocimiento
 DB_FILE = "knowledge.json"
 
-# Función para cargar conocimiento
+# ------------------------------
+# Funciones de manejo del conocimiento
+# ------------------------------
+
 def load_knowledge():
+    """Carga el conocimiento desde el archivo JSON o lo crea si no existe."""
+
+    # Si el archivo de conocimiento no existe, creamos uno nuevo con frases iniciales
     if not os.path.exists(DB_FILE):
-        # Conocimiento inicial precargado
         initial_data = {
             "Hola": "¡Hola! ¿Cómo estás?",
             "¿Cómo estás?": "Estoy bien, gracias por preguntar 😊",
             "¿De qué te gustaría hablar?": "Podemos hablar de tecnología, ciencia o lo que quieras."
         }
+        # Guardamos esas frases iniciales en un archivo JSON
         with open(DB_FILE, "w", encoding="utf-8") as f:
             json.dump(initial_data, f, indent=4, ensure_ascii=False)
+
+    # Abrimos y cargamos el archivo JSON con el conocimiento almacenado
     with open(DB_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 
-# Función para guardar conocimiento
+
 def save_knowledge(data):
+    """Guarda el conocimiento en el archivo JSON."""
+    # Escribe el diccionario "data" en el archivo JSON con indentación bonita
     with open(DB_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-# Chat principal
-def chat():
-    print("🤖 ChatBot con módulo de adquisición de conocimiento")
-    print("Escribe 'salir' para terminar.\n")
 
+# ------------------------------
+# Función principal del ChatBot
+# ------------------------------
+
+def chat():
+    """Ejecuta el chat interactivo con adquisición de conocimiento."""
+
+    # Mensaje de bienvenida con formato de colores
+    print(Fore.CYAN + "===========================================")
+    print(Fore.YELLOW + "     🤖 ChatBot: Registro_Adquirir_Conocimiento")
+    print(Fore.CYAN + "===========================================")
+    print(Fore.GREEN + "Escribe 'salir' para terminar la conversación.\n")
+
+    # Cargamos el conocimiento inicial desde el archivo JSON
     knowledge = load_knowledge()
 
+    # Bucle infinito del chat hasta que el usuario escriba "salir"
     while True:
-        user_input = input("Tú: ").strip()
+        # Pedimos al usuario que escriba un mensaje
+        user_input = input(Fore.BLUE + "Tú: " + Style.RESET_ALL).strip()
 
+        # Si el usuario escribe "salir", terminamos el chat
         if user_input.lower() == "salir":
-            print("🤖 ChatBot: ¡Hasta luego!")
+            print(Fore.MAGENTA + "🤖 ChatBot: ¡Hasta luego! 👋")
             break
 
+        # Si el mensaje del usuario existe en la base de conocimiento
         if user_input in knowledge:
-            print("🤖 ChatBot:", knowledge[user_input])
+            # Respondemos con la respuesta asociada
+            print(Fore.YELLOW + "🤖 ChatBot: " + knowledge[user_input])
         else:
-            print("🤖 ChatBot: No sé cómo responder eso.")
-            new_response = input("👉 ¿Qué debería contestar? ")
+            # Si no existe una respuesta, pedimos al usuario que nos enseñe
+            print(Fore.RED + "🤖 ChatBot: No sé cómo responder eso.")
+            new_response = input(Fore.CYAN + "👉 ¿Qué debería contestar? " + Style.RESET_ALL)
+            
+            # Guardamos el nuevo conocimiento en el diccionario
             knowledge[user_input] = new_response
+            # Persistimos el nuevo conocimiento en el archivo JSON
             save_knowledge(knowledge)
-            print("🤖 ChatBot: ¡Gracias! Aprendí algo nuevo.")
+            # Confirmamos al usuario que el bot aprendió algo nuevo
+            print(Fore.GREEN + "🤖 ChatBot: ¡Gracias! Aprendí algo nuevo.")
+            # Mostramos en consola qué se agregó exactamente
+            print(Fore.LIGHTBLACK_EX + f"(Nuevo conocimiento: '{user_input}' → '{new_response}')\n")
 
+
+# ------------------------------
+# Ejecutar el chat
+# ------------------------------
+
+# Este condicional asegura que el chat solo se ejecute si el archivo
+# es ejecutado directamente (y no importado desde otro script)
 if __name__ == "__main__":
     chat()
