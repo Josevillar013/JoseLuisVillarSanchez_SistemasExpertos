@@ -2,7 +2,7 @@
 # Ejemplo sencillo de Inteligencia Artificial
 # Caso de la vida diaria: ¿Debo llevar paraguas?
 # Algoritmo: Árbol de Decisión
-# Autor: ChatGPT
+# Autor: Jose Luis Villar
 # =============================================
 
 # Importamos las librerías necesarias
